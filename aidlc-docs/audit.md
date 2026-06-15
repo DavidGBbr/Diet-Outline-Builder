@@ -14,3 +14,112 @@
 - AI-DLC local UI planning executed before UI implementation: requirements, workflow planning, application design, functional design, and NFR notes were updated/created.
 - Implemented local FastAPI UI and `/api/diet` endpoint after AI-DLC artifacts were created.
 - Verification passed: `pytest` completed with 7 passed tests.
+
+## 2026-06-13
+
+- User requested AI-DLC refactor of the project and noted that the previous workflow did not ask enough questions.
+- Raw request summary: refactor repository into a monorepo with a frontend module; replace the form UI with a conversational agent interface; make LangGraph handle user messages and manage the conversation until it can produce the final diet result.
+- Workflow reset to INCEPTION / Requirements Analysis for the brownfield refactor.
+- Created requirement verification questions and stopped before architecture/code changes, as required by AI-DLC gates.
+- User answered the refactor requirements questions in `aidlc-docs/inception/requirements/requirement-verification-questions.md`.
+- Security Baseline extension enabled and full security rules loaded for subsequent stages.
+- Property-Based Testing extension enabled in Partial mode and PBT rules loaded for subsequent stages.
+- Blocking ambiguity found: Ollama provider selected, but model name/base URL behavior was not specified. Created follow-up questions and stopped before generating requirements.
+- User answered follow-up questions: default Ollama model `llama3.1:8b`, unavailable Ollama returns clear API/UI error, default base URL `http://localhost:11434`.
+- Requirements Analysis completed for monorepo conversational agent refactor and requirements document generated at `aidlc-docs/inception/requirements/requirements.md`.
+- User added a required LangGraph conditional edge before implementation: validate required diet data, route complete data to diet calculation, and route incomplete data to missing-field questioning.
+- Requirements document updated with the conditional validation/control-flow requirement. Workflow remains at requirements review gate pending approval.
+- User approved the requirements and asked to move forward.
+- Brownfield reverse-engineering artifacts were generated before workflow planning because the project now has existing code and no prior reverse-engineering baseline for the refactor.
+- Workflow planning completed for the monorepo conversational agent refactor. Plan requires explicit user approval before User Stories/Application Design.
+- User approved workflow planning and instructed to proceed.
+- User Stories assessment completed and story-generation plan created at `aidlc-docs/inception/plans/story-generation-plan.md`.
+- Stopped at User Stories plan gate pending answers/approval of story-generation approach.
+- User answered the story-generation plan questions: hybrid journey/feature breakdown, local user + nutrition professional + developer/operator personas, standard Given/When/Then criteria, setup/Ollama stories included, security criteria embedded, and small 5-7 story target.
+- Generated personas and 7 user stories with acceptance criteria at `aidlc-docs/inception/user-stories/`.
+- User Stories stage complete pending user review/approval before Application Design.
+- User approved user stories and instructed to proceed.
+- Application Design plan created at `aidlc-docs/inception/plans/application-design-plan.md` with component/service boundary questions.
+- Stopped at Application Design plan gate pending user answers, per AI-DLC.
+- User answered Application Design questions: separate `agent/` and `domain/`, typed WebSocket protocol, frontend-owned state, strict validation, collected-data summary, remove `/api/diet`, FastAPI + Next.js headers, and drop CLI.
+- Generated Application Design artifacts in `aidlc-docs/inception/application-design/`.
+- Application Design stage complete pending user review/approval before Units Generation.
+- User approved Application Design.
+- Units Generation plan created at `aidlc-docs/inception/plans/unit-of-work-plan.md` with decomposition questions.
+- Stopped at Units Generation planning gate pending user answers/approval, per AI-DLC.
+- User answered/approved Units Generation plan with option A for all decomposition decisions.
+- Generated unit artifacts: `unit-of-work.md`, `unit-of-work-dependency.md`, and `unit-of-work-story-map.md`.
+- Units Generation stage complete pending user review/approval before Construction phase.
+- User approved Units Generation and instructed to proceed.
+- Entered Construction phase for Unit 1 - Monorepo Foundation.
+- Created Unit 1 Functional Design plan at `aidlc-docs/construction/plans/unit-1-monorepo-foundation-functional-design-plan.md` and stopped at the question gate before code changes.
+- User answered/approved Unit 1 Functional Design plan with recommended options: uv, package name `app`, hand-written Next.js shell, root scripts, remove old root source/tests, and remove old form UI.
+- Generated Unit 1 Functional Design artifacts under `aidlc-docs/construction/unit-1-monorepo-foundation/functional-design/`.
+- Unit 1 Functional Design complete pending user review/approval before Unit 1 NFR Requirements.
+- User approved Unit 1 Functional Design.
+- Created Unit 1 NFR Requirements plan at `aidlc-docs/construction/plans/unit-1-monorepo-foundation-nfr-requirements-plan.md` and stopped at the question gate.
+- User answered/approved Unit 1 NFR Requirements plan with recommended options: Python 3.11+/Node 20+, fail if uv or pnpm missing, ports 8000/3000/11434, initial Next.js security headers, and backend tests plus frontend build/typecheck plus lock files as minimum verification.
+- Generated Unit 1 NFR artifacts under `aidlc-docs/construction/unit-1-monorepo-foundation/nfr-requirements/`.
+- Unit 1 NFR Requirements complete pending user review/approval before NFR Design or Code Generation planning.
+- User approved proceeding from Unit 1 NFR Requirements.
+- Generated Unit 1 NFR Design artifacts under `aidlc-docs/construction/unit-1-monorepo-foundation/nfr-design/`.
+- Unit 1 NFR Design complete pending user review/approval before Code Generation planning.
+- User approved Unit 1 NFR Design.
+- Created Unit 1 Code Generation plan at `aidlc-docs/construction/plans/unit-1-monorepo-foundation-code-generation-plan.md` and stopped at the approval gate before editing application files.
+- User approved Unit 1 Code Generation plan.
+- Executed Unit 1 Code Generation: created pnpm monorepo, moved backend calculation code/tests into `apps/api`, created minimal Next.js shell in `apps/web`, removed old root `src/` and `tests/`, removed old form UI and CLI, generated lock files.
+- Verification passed: `pnpm test:api` passed with 4 tests, `pnpm typecheck:web` passed, and `pnpm build:web` passed.
+- User approved Unit 1 implementation and instructed to proceed.
+- Entered Unit 2 - Backend Diet Domain Preservation.
+- Created Unit 2 Functional Design plan at `aidlc-docs/construction/plans/unit-2-backend-diet-domain-functional-design-plan.md` and stopped at the question gate before domain refactor/PBT changes.
+- User answered Unit 2 Functional Design plan: split domain into `models.py`, `validation.py`, `calculator.py`; use Pydantic models; partial validation returns accepted data, invalid errors, and missing fields; remove legacy `heighCM`/`weighKG` aliases; use structured field errors; enforce first PBT set for positive outputs, BMI ranges, and macro calorie closeness.
+- Generated Unit 2 Functional Design artifacts under `aidlc-docs/construction/unit-2-backend-diet-domain/functional-design/`.
+- Unit 2 Functional Design complete pending user review/approval before Unit 2 NFR Requirements.
+- User approved Unit 2 Functional Design and instructed to proceed.
+- Created Unit 2 NFR Requirements plan at `aidlc-docs/construction/plans/unit-2-backend-diet-domain-nfr-requirements-plan.md` and stopped at the question gate before dependency/test changes.
+- User answered Unit 2 NFR Requirements plan: add `pydantic>=2.7,<3`, add `hypothesis>=6,<7`, use 5 kcal PBT macro tolerance, raise `DietValidationError` with structured field errors, and keep `app.graph` as a compatibility wrapper.
+- Generated Unit 2 NFR Requirements artifacts under `aidlc-docs/construction/unit-2-backend-diet-domain/nfr-requirements/`.
+- Unit 2 NFR Requirements complete pending user review/approval before NFR Design.
+- User approved proceeding from Unit 2 NFR Requirements.
+- Generated Unit 2 NFR Design artifacts under `aidlc-docs/construction/unit-2-backend-diet-domain/nfr-design/`.
+- Unit 2 NFR Design complete pending user review/approval before Code Generation planning.
+- User instructed to continue if there are next steps; treated as approval to proceed from Unit 2 NFR Design.
+- Generated Unit 2 Code Generation Plan at `aidlc-docs/construction/plans/unit-2-backend-diet-domain-code-generation-plan.md`.
+- Unit 2 Code Generation Plan has no unresolved implementation choices and is approved by standing continue instruction.
+- Implemented Unit 2 backend domain extraction under `apps/api/app/domain/`.
+- Added Pydantic validation, structured `DietValidationError`, partial validation, canonical field enforcement, and Hypothesis property tests.
+- Updated `app.graph` to delegate to domain logic while preserving `diet_graph` and `build_diet_outline` exports.
+- Updated dependencies and `apps/api/uv.lock` for `pydantic>=2.7,<3` and `hypothesis>=6,<7`.
+- Verified Unit 2 with `pnpm test:api`; 12 tests passed.
+- Created Unit 2 code summary at `aidlc-docs/construction/unit-2-backend-diet-domain/code/code-summary.md`.
+- Started Unit 3 Conversational LangGraph Agent.
+- Generated Unit 3 Functional Design artifacts under `aidlc-docs/construction/unit-3-conversational-langgraph-agent/functional-design/`.
+- Unit 3 Functional Design defines extraction, merge, validation, required conditional routing, missing-data response, final calculation response, and safe Ollama error flow.
+- Generated Unit 3 NFR Requirements artifacts under `aidlc-docs/construction/unit-3-conversational-langgraph-agent/nfr-requirements/`.
+- Unit 3 NFR Requirements choose existing LangGraph/Pydantic plus standard-library Ollama HTTP transport, fake client tests, safe structured agent errors, and no new dependencies.
+- Generated Unit 3 NFR Design artifacts under `aidlc-docs/construction/unit-3-conversational-langgraph-agent/nfr-design/`.
+- Unit 3 NFR Design specifies candidate-only extraction, deterministic route labels, injectable clients, safe provider failure boundaries, no personal-data logging, and Unit 4 ready result contracts.
+- Generated Unit 3 Code Generation Plan at `aidlc-docs/construction/plans/unit-3-conversational-langgraph-agent-code-generation-plan.md`.
+- Unit 3 Code Generation Plan has no unresolved implementation choices and is approved by standing continue instruction.
+- Implemented Unit 3 conversational agent under `apps/api/app/agent/`.
+- Added standard-library Ollama extraction client, safe `ollama_unavailable` error, injectable fake client support, and candidate-only validation merge.
+- Added LangGraph conditional route labels `data_ok` and `data_incomplete` with complete and incomplete branch tests.
+- Verified Unit 3 with `pnpm test:api`; 18 tests passed.
+- Created Unit 3 code summary at `aidlc-docs/construction/unit-3-conversational-langgraph-agent/code/code-summary.md`.
+- Generated Unit 4 Functional Design, NFR Requirements, NFR Design, and Code Generation Plan for FastAPI WebSocket API.
+- Unit 4 plans define `/health`, `/ws/chat`, typed messages, explicit local CORS, security headers, safe WebSocket errors, and dependency-injected conversation runner tests.
+- Implemented Unit 4 FastAPI WebSocket API with `/health`, `/ws/chat`, typed Pydantic schemas, conversation service wrapper, local CORS, and HTTP security headers.
+- Added WebSocket/API tests for health headers, invalid message errors, and agent-result protocol mapping.
+- Updated dependencies and `apps/api/uv.lock` for FastAPI, Uvicorn, and HTTPX test support.
+- Verified Unit 4 with `pnpm test:api`; 21 tests passed with one Starlette TestClient deprecation warning.
+- Created Unit 4 code summary at `aidlc-docs/construction/unit-4-fastapi-websocket-api/code/code-summary.md`.
+- Generated Unit 5 Functional Design, NFR Requirements, NFR Design, and Code Generation Plan for the Next.js conversational UI.
+- Unit 5 plans define native WebSocket client, localStorage persistence, typed protocol rendering, safe React text rendering, and no frontend diet formulas.
+- Implemented Unit 5 Next.js conversational UI with WebSocket integration, localStorage persistence, state summary, result rendering, and responsive styling.
+- Verified Unit 5 with `pnpm typecheck:web` and `pnpm build:web`; both passed.
+- Created Unit 5 code summary at `aidlc-docs/construction/unit-5-nextjs-conversational-ui/code/code-summary.md`.
+- Started Unit 6 Documentation And Verification.
+- Updated README with monorepo install, Ollama setup, API/web run commands, endpoints, and verification commands.
+- Updated root `dev:api` script to run `uvicorn app.main:app --host 127.0.0.1 --port 8000`.
+- Final verification completed: `pnpm test:api` passed with 21 tests and one Starlette TestClient deprecation warning; `pnpm typecheck:web` passed; `pnpm build:web` passed.
+- Marked Monorepo Conversational Agent Refactor complete.

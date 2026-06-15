@@ -51,6 +51,12 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# JavaScript / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
 # Translations
 *.mo
 *.pot
