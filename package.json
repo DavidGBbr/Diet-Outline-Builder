@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "dev:api": "cd apps/api && uv run uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "dev:api": "cd apps/api && uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --env-file ../../.env",
     "dev:web": "pnpm --dir apps/web dev",
     "test:api": "cd apps/api && uv run pytest",
     "typecheck:web": "pnpm --dir apps/web typecheck",

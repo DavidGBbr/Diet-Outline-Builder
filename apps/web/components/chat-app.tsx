@@ -60,6 +60,40 @@ function appendMessage(
   setMessages((messages) => [...messages, { id: createId(), role, text }]);
 }
 
+function DietResultCard({ dietResult, className = "" }: { dietResult: DietResult; className?: string }) {
+  return (
+    <section className={`result-card ${className}`}>
+      <p className="eyebrow">Diet result</p>
+      <div className="metric-grid">
+        <div>
+          <span>BMI</span>
+          <strong>{dietResult.imc}</strong>
+        </div>
+        <div>
+          <span>Target</span>
+          <strong>{dietResult.targetSpend} kcal</strong>
+        </div>
+      </div>
+      <dl className="macro-list">
+        <div>
+          <dt>Protein</dt>
+          <dd>{dietResult.macros.protein} g</dd>
+        </div>
+        <div>
+          <dt>Fat</dt>
+          <dd>{dietResult.macros.fat} g</dd>
+        </div>
+        <div>
+          <dt>Carbs</dt>
+          <dd>{dietResult.macros.carb} g</dd>
+        </div>
+      </dl>
+      <p>{dietResult.explanation}</p>
+      <p className="disclaimer">{dietResult.safetyDisclaimer}</p>
+    </section>
+  );
+}
+
 export function ChatApp() {
   const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
   const [conversationState, setConversationState] = useState<ConversationState>(emptyConversationState);
@@ -68,13 +102,22 @@ export function ChatApp() {
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [hydrated, setHydrated] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const stored = loadStoredConversation();
     if (stored) {
-      setMessages(stored.messages.length > 0 ? stored.messages : [welcomeMessage]);
-      setConversationState(stored.state);
-      setDietResult(stored.dietResult);
+      setMessages((currentMessages) =>
+        currentMessages.length === 1 && currentMessages[0]?.id === welcomeMessage.id
+          ? stored.messages.length > 0
+            ? stored.messages
+            : [welcomeMessage]
+          : currentMessages,
+      );
+      setConversationState((currentState) =>
+        Object.keys(currentState.collectedData).length === 0 ? stored.state : currentState,
+      );
+      setDietResult((currentResult) => currentResult ?? stored.dietResult);
     }
     setHydrated(true);
   }, []);
@@ -90,6 +133,10 @@ export function ChatApp() {
       dietResult,
     });
   }, [conversationState, dietResult, hydrated, messages]);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, status]);
 
   function handleServerMessage(message: ServerMessage) {
     if (message.type === "assistant_message") {
@@ -197,6 +244,14 @@ export function ChatApp() {
               <p>{message.text}</p>
             </article>
           ))}
+          {status === "sending" && (
+            <article className="message system pending">
+              <span>status</span>
+              <p>Waiting for local Ollama. The first response can take a bit while the model loads.</p>
+            </article>
+          )}
+          {dietResult && <DietResultCard dietResult={dietResult} className="chat-result" />}
+          <div ref={messageEndRef} />
         </div>
 
         <form className="composer" onSubmit={handleSubmit}>
@@ -212,7 +267,7 @@ export function ChatApp() {
             value={input}
           />
           <button type="submit" disabled={status === "sending"}>
-            {status === "sending" ? "Sending..." : "Send"}
+            {status === "sending" ? "Waiting..." : "Send"}
           </button>
         </form>
       </section>
@@ -238,37 +293,7 @@ export function ChatApp() {
           )}
         </section>
 
-        {dietResult && (
-          <section className="result-card">
-            <p className="eyebrow">Diet result</p>
-            <div className="metric-grid">
-              <div>
-                <span>BMI</span>
-                <strong>{dietResult.imc}</strong>
-              </div>
-              <div>
-                <span>Target</span>
-                <strong>{dietResult.targetSpend} kcal</strong>
-              </div>
-            </div>
-            <dl className="macro-list">
-              <div>
-                <dt>Protein</dt>
-                <dd>{dietResult.macros.protein} g</dd>
-              </div>
-              <div>
-                <dt>Fat</dt>
-                <dd>{dietResult.macros.fat} g</dd>
-              </div>
-              <div>
-                <dt>Carbs</dt>
-                <dd>{dietResult.macros.carb} g</dd>
-              </div>
-            </dl>
-            <p>{dietResult.explanation}</p>
-            <p className="disclaimer">{dietResult.safetyDisclaimer}</p>
-          </section>
-        )}
+        {dietResult && <DietResultCard dietResult={dietResult} />}
       </aside>
     </main>
   );
